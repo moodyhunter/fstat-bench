@@ -12,6 +12,8 @@
 
 struct stat *s = new (std::align_val_t(4096)) struct stat;
 
+constexpr auto MAX_FILES = 1000000;
+
 template<size_t N>
 std::chrono::microseconds timed_run(const std::string (&strings)[N])
 {
@@ -48,9 +50,9 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    std::string strings[1000]; // 1000 files
+    std::string strings[MAX_FILES] = { 0 }; // 1000 files
     size_t i = 0;
-    while (file.good() && i < 1000)
+    while (file.good() && i < MAX_FILES)
     {
         std::getline(file, strings[i++]);
     }
