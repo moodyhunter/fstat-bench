@@ -22,7 +22,7 @@ std::chrono::microseconds timed_run(const std::string *strings, const size_t N)
     {
         const auto result = stat(strings[i].c_str(), s);
         if (unlikely(result != 0))
-            std::cerr << "stat failed: " << std::strerror(errno) << std::endl;
+            std::cerr << "stat failed: " << std::strerror(errno) << " for " << strings[i] << std::endl;
     }
     const auto end = std::chrono::high_resolution_clock::now();
     return std::chrono::duration_cast<std::chrono::microseconds>(end - start);
