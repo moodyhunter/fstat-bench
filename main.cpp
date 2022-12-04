@@ -15,15 +15,15 @@
 
 struct stat *s = new (std::align_val_t(4096)) struct stat;
 
-constexpr auto MAX_SUPPORTED_FILES = 10000000;
+constexpr auto MAX_SUPPORTED_FILES = 100000000;
 
 std::pair<std::chrono::microseconds, size_t> timed_run(const std::string *strings, const size_t N)
 {
-    constexpr auto FD_CACHE_SIZE = 4096;
+    constexpr auto FD_CACHE_SIZE = 1024;
 
     std::chrono::microseconds total_time(0);
     size_t total_files = 0;
-    int *fd_cache = new int[FD_CACHE_SIZE]{ -1 };
+    int *fd_cache = new (std::align_val_t(4096)) int[FD_CACHE_SIZE]{ -1 };
 
     std::cout << "Using a batch size of " << FD_CACHE_SIZE << std::endl;
 
@@ -31,11 +31,15 @@ std::pair<std::chrono::microseconds, size_t> timed_run(const std::string *string
     size_t batch_idx = 0;
     while (next_string < strings + N)
     {
-        std::cout << "Processing batch " << batch_idx++ << std::endl;
+        if (batch_idx % 20 == 0)
+            std::cout << "Processing batch " << batch_idx << std::endl;
+        batch_idx++;
         size_t valid_fd_count = 0;
         for (valid_fd_count = 0; valid_fd_count < FD_CACHE_SIZE && (next_string < strings + N); next_string++)
         {
-            int fd = open(next_string->c_str(), O_RDONLY);
+            if (next_string->empty())
+                continue;
+            int fd = open(next_string->c_str(), O_NOFOLLOW | O_PATH);
             if (unlikely(fd == -1))
             {
                 std::cerr << "Ignored file: " << *next_string << " (" << strerror(errno) << ")" << std::endl;
@@ -80,6 +84,7 @@ int main(int argc, char *argv[])
         return 1;
     }
 
+    std::cout << "Allocating memory..." << std::endl;
     std::string *strings = new std::string[MAX_SUPPORTED_FILES];
     size_t i = 0;
     while (file.good() && i < MAX_SUPPORTED_FILES)

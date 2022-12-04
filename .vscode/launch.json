@@ -6,7 +6,7 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceRoot}/build/fstat-benchmark",
-            "args": [ "compile_commands.json" ],
+            "args": [ "files.list" ],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}/build",
             "environment": [ ],
