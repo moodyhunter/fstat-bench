@@ -20,7 +20,6 @@ std::chrono::microseconds timed_run(const std::string *strings, const size_t N)
     auto start = std::chrono::high_resolution_clock::now();
     for (size_t i = 0; i < N; ++i)
     {
-        std::cout << strings[i] << std::endl;
         result += stat(strings[i].c_str(), s);
     }
     auto end = std::chrono::high_resolution_clock::now();
@@ -55,6 +54,8 @@ int main(int argc, char *argv[])
     {
         std::getline(file, strings[i++]);
     }
+
+    std::cout << "Starting test `stat` on " << i << " files" << std::endl;
 
     auto duration = timed_run(strings, i);
     std::cout << "duration: " << duration.count() << "us" << std::endl;
