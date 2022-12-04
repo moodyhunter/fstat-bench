@@ -13,13 +13,12 @@
 
 #define unlikely(x) __builtin_expect(!!(x), 0)
 
-struct stat *s = new (std::align_val_t(4096)) struct stat;
-
 constexpr auto MAX_SUPPORTED_FILES = 100000000;
 
 std::pair<std::chrono::microseconds, size_t> timed_run(const std::string *strings, const size_t N)
 {
     constexpr auto FD_CACHE_SIZE = 1024;
+    struct stat *s = new (std::align_val_t(4096)) struct stat;
 
     std::chrono::microseconds total_time(0);
     size_t total_files = 0;
@@ -66,6 +65,7 @@ std::pair<std::chrono::microseconds, size_t> timed_run(const std::string *string
     }
 
     delete[] fd_cache;
+    delete s;
     return { total_time, total_files };
 }
 
