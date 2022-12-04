@@ -1,5 +1,6 @@
 #include <chrono>
 #include <cstdio>
+#include <cstring>
 #include <fstream>
 #include <functional>
 #include <iostream>
@@ -16,20 +17,14 @@ constexpr auto MAX_FILES = 1000000;
 
 std::chrono::microseconds timed_run(const std::string *strings, const size_t N)
 {
-    int result = 0;
-    auto start = std::chrono::high_resolution_clock::now();
+    const auto start = std::chrono::high_resolution_clock::now();
     for (size_t i = 0; i < N; ++i)
     {
-        result += stat(strings[i].c_str(), s);
+        const auto result = stat(strings[i].c_str(), s);
+        if (unlikely(result != 0))
+            std::cerr << "stat failed: " << std::strerror(errno) << std::endl;
     }
-    auto end = std::chrono::high_resolution_clock::now();
-
-    if (unlikely(result != 0))
-    {
-        std::cerr << "stat failed" << std::endl;
-        return std::chrono::microseconds(0);
-    }
-
+    const auto end = std::chrono::high_resolution_clock::now();
     return std::chrono::duration_cast<std::chrono::microseconds>(end - start);
 }
 
