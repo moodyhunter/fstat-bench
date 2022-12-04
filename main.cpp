@@ -19,6 +19,7 @@ std::chrono::microseconds timed_run(const std::string (&strings)[N])
     auto start = std::chrono::high_resolution_clock::now();
     for (size_t i = 0; i < N; ++i)
     {
+        std::cout << strings[i] << std::endl;
         result += stat(strings[i].c_str(), s);
     }
     auto end = std::chrono::high_resolution_clock::now();
