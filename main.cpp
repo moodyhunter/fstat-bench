@@ -95,8 +95,10 @@ int main(int argc, char *argv[])
     std::cout << "Starting test `stat` on " << i << " files" << std::endl;
 
     auto [duration, files] = timed_run(strings, i);
-    std::cout << "duration: " << duration.count() << "us for " << files << " files" << std::endl;
     delete[] strings;
+
+    std::cout << "Processed " << files << " files in " << duration.count() << " microseconds" << std::endl;
+    std::cout << "  avg: " << (long double) duration.count() / files << " microseconds (or " << files * 1000000 / duration.count() << " files per second)" << std::endl;
 
     return 0;
 }
