@@ -15,19 +15,23 @@
 
 struct stat *s = new (std::align_val_t(4096)) struct stat;
 
-constexpr auto MAX_FILES = 1000000;
-constexpr auto FD_CACHE_SIZE = 4096;
+constexpr auto MAX_SUPPORTED_FILES = 10000000;
 
 std::pair<std::chrono::microseconds, size_t> timed_run(const std::string *strings, const size_t N)
 {
+    constexpr auto FD_CACHE_SIZE = 4096;
+
     std::chrono::microseconds total_time(0);
     size_t total_files = 0;
     int *fd_cache = new int[FD_CACHE_SIZE]{ -1 };
 
-    const std::string *next_string = strings;
+    std::cout << "Using a batch size of " << FD_CACHE_SIZE << std::endl;
 
+    const std::string *next_string = strings;
+    size_t batch_idx = 0;
     while (next_string < strings + N)
     {
+        std::cout << "Processing batch " << batch_idx++ << std::endl;
         size_t valid_fd_count = 0;
         for (valid_fd_count = 0; valid_fd_count < FD_CACHE_SIZE && (next_string < strings + N); next_string++)
         {
@@ -49,11 +53,11 @@ std::pair<std::chrono::microseconds, size_t> timed_run(const std::string *string
             else
                 total_files++;
         }
+        const auto end = std::chrono::high_resolution_clock::now();
 
         for (size_t i = 0; i < valid_fd_count; ++i)
             close(fd_cache[i]);
 
-        const auto end = std::chrono::high_resolution_clock::now();
         total_time += std::chrono::duration_cast<std::chrono::microseconds>(end - start);
     }
 
@@ -76,9 +80,9 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    std::string *strings = new std::string[MAX_FILES];
+    std::string *strings = new std::string[MAX_SUPPORTED_FILES];
     size_t i = 0;
-    while (file.good() && i < MAX_FILES)
+    while (file.good() && i < MAX_SUPPORTED_FILES)
     {
         std::getline(file, strings[i++]);
     }
